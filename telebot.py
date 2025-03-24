@@ -570,6 +570,8 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                     else:
                         output += "\n\n📄 No hay archivos."
 
+                    await event.reply(output, parse_mode="markdown")
+
                 elif command == "cambiar ruta":
                     modo = "esperando_carpeta"
                     output = f"🛠️ ¿Dónde quieres guardar las descargas?"
