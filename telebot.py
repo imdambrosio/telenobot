@@ -51,7 +51,7 @@ logging.basicConfig(
 )
 
 # Versionado
-TDD_VERSION = "2.0.2"
+TDD_VERSION = "2.0.3"
 
 # Cargar configuración desde los archivos
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -634,7 +634,8 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                                 RUTA_ACTUAL = os.path.join(RUTA_ACTUAL, item)
                                 break
                         output = f"✅ Ruta de descarga establecida en:\n`{RUTA_ACTUAL}`"
-                        descargas_activas[archivo_en_edicion]['ruta'] = RUTA_ACTUAL
+                        if archivo_en_edicion:
+                            descargas_activas[archivo_en_edicion]['ruta'] = RUTA_ACTUAL
                         modo = None
                         archivo_en_edicion = None
                         if not sub == None:
