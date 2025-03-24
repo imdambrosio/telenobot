@@ -1,0 +1,10 @@
+{
+    "api_id": 12345678,
+    "api_hash": "hash",
+    "channel_id": -1234567891234,
+    "session_path": null,
+    "dest": "ruta destino",
+    "temp": "ruta provisional",
+    "duplicates": "rename",
+    "workers": 4
+  }

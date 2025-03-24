@@ -1,0 +1,68 @@
+{
+  "comandos": [
+    {
+      "comando": "borrar historial",
+      "descripcion": "Borra el historial de mensajes del bot en el chat."
+    },
+    {
+      "comando": "cambiar ruta",
+      "descripcion": "Permite elegir una nueva ruta de descarga desde el listado de destinos."
+    },
+    {
+      "comando": "cambiar ruta de descarga",
+      "descripcion": "Permite cambiar la ruta de descarga de un archivo activo individualmente."
+    },
+    {
+      "comando": "descargar enlace <URL>",
+      "descripcion": "Descarga un mensaje con archivo desde un enlace tipo https://t.me/.../"
+    },
+    {
+      "comando": "disco duro",
+      "descripcion": "Comprueba si el disco está montado correctamente."
+    },
+    {
+      "comando": "estado servicios",
+      "descripcion": "Muestra el estado de servicios como ps3netsrv, minidlna, smbd, apache2."
+    },
+    {
+      "comando": "limpiar temp",
+      "descripcion": "Limpia la carpeta temporal definida en TELEGRAM_DAEMON_TEMP."
+    },
+    {
+      "comando": "listar contenido",
+      "descripcion": "Lista subcarpetas y archivos dentro de la ruta actual."
+    },
+    {
+      "comando": "listar rutas",
+      "descripcion": "Muestra los directorios disponibles como destinos de descarga."
+    },
+    {
+      "comando": "listar subcarpetas",
+      "descripcion": "Lista subcarpetas dentro de la ruta actual."
+    },
+    {
+      "comando": "montar disco",
+      "descripcion": "Monta el disco duro manualmente (alias: montar disco duro)."
+    },
+    {
+      "comando": "mover completados",
+      "descripcion": "Mueve archivos con descarga 100% al destino final configurado."
+    },
+    {
+      "comando": "reiniciar",
+      "descripcion": "Reinicia la Raspberry Pi."
+    },
+    {
+      "comando": "reiniciar servicio <nombre>",
+      "descripcion": "Reinicia el servicio especificado."
+    },
+    {
+      "comando": "ruta de descarga",
+      "descripcion": "Muestra la ruta actual configurada para las descargas."
+    },
+    {
+      "comando": "status",
+      "descripcion": "Muestra el estado del bot y las descargas activas."
+    }
+  ]
+}

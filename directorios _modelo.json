@@ -1,0 +1,7 @@
+{
+    "defecto": "ruta defecto",
+    "Pelis": "/ruta defecto/Pelis",
+    "Series": "/ruta defecto/Series",
+    "Fotos": "/ruta defecto/Fotos",
+    "Juegos": "/ruta defecto/Juegos"
+}
