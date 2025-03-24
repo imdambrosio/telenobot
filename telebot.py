@@ -8,6 +8,7 @@ import json
 import time
 import math
 import shutil
+import sys
 import logging
 import asyncio
 import argparse
@@ -30,7 +31,6 @@ from telethon.tl.types import (
 from sessionManager import getSession, saveSession
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import sys
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -42,8 +42,7 @@ log_file = open(log_path, "a", buffering=1)  # line-buffered
 sys.stdout = log_file
 sys.stderr = log_file
 
-print("🟢 Logging iniciado:", datetime.now())
-print("📝 Este print debería aparecer en el log")
+print("\n🟢 Logging iniciado:", datetime.now())
 
 # Logging básico
 logging.basicConfig(
@@ -52,7 +51,7 @@ logging.basicConfig(
 )
 
 # Versionado
-TDD_VERSION = "2.0"
+TDD_VERSION = "2.0.2"
 
 # Cargar configuración desde los archivos
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -477,28 +476,40 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                     archivos_descargandose = list(descargas_activas.keys())
                     output = "❌ Índice no válido"
                     try:
-                        index = int(command) - 1
+                        index = int(command)
                         if 1 <= index <= len(archivos_descargandose):
                             modo = "waiting_change"
+                            index -= 1
                             archivo_en_edicion = archivos_descargandose[index]
                             ruta_archivo = descargas_activas[archivo_en_edicion]['ruta']
                             output = f"📤 Archivo seleccionado: {archivo_en_edicion}\n📁 Descargándose en: {ruta_archivo}\n🛠️ ¿Dónde quieres que se descargue?\n"
+                            await log_reply(event.message, output)
                             lista = "\n".join([f"• `{nombre}` → `{ruta}`" for nombre, ruta in DESTINOS_DISPONIBLES.items()])
                             await event.respond(f"📁 Directorios disponibles:\n\n{lista}")
+                        else:
+                            modo = None
                     except ValueError:
                         modo = None
                 
                 elif modo == "waiting_change":
-                    nueva_ruta = DESTINOS_DISPONIBLES.get(command)
+                    desti = [key.lower() for key in DESTINOS_DISPONIBLES.keys()]
+                    if command in desti:
+                        for clave in DESTINOS_DISPONIBLES:
+                            if clave.lower() == command:
+                                clave_real = clave
+                                break
 
-                    if nueva_ruta:
-                        descargas_activas[archivo_en_edicion]["ruta"] = nueva_ruta
-                        output = f"✅ Ruta de descarga actualizada a:\n`{nueva_ruta}`"
+                    if clave_real:
+                        descargas_activas[archivo_en_edicion]["ruta"] = DESTINOS_DISPONIBLES[clave_real]
+                        nueva_ruta = descargas_activas[archivo_en_edicion]["ruta"]
+                        if os.path.exists(nueva_ruta) and os.path.isdir(nueva_ruta):
+                            RUTA_ACTUAL = nueva_ruta
+                            output = f"🛠️ Carpeta seleccionada: `{clave_real}` - `{RUTA_ACTUAL}`\n¿Quieres crear, usar una subcarpeta o ahí mismo?"
+                            modo = "subcarpeta archivo"
                     else:
                         output = f"❌ Ruta no válida. Usa un nombre del listado."
-
-                    archivo_en_edicion = None
-                    modo = None
+                        modo = None
+                        archivo_en_edicion = None
 
                 elif command.startswith("descargar enlace"):
                     try:
@@ -600,7 +611,10 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                     subcarpetas = listar_subcarpetas(RUTA_ACTUAL)
                     if "crear" in command or command == "si":
                         output = "📁 Escribe el nombre de la subcarpeta a crear:"
-                        modo = "creando_subcarpeta"
+                        if "archivo" in modo:
+                            modo = "creando_subcarpeta archivo"
+                        else:
+                            modo = "creando_subcarpeta"
                     
                     elif modo and "alt" in modo:
                         modo = None
@@ -620,29 +634,34 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                                 RUTA_ACTUAL = os.path.join(RUTA_ACTUAL, item)
                                 break
                         output = f"✅ Ruta de descarga establecida en:\n`{RUTA_ACTUAL}`"
+                        descargas_activas[archivo_en_edicion]['ruta'] = RUTA_ACTUAL
                         modo = None
+                        archivo_en_edicion = None
                         if not sub == None:
                             output += "\n🛠️ ¿Deseas añadirla al listado de directorios disponibles?"
                             modo = "elegir_guardar_carpeta"
                             DIRECTORIO_TEMPORAL = cargar_destinos().copy()
                             DIRECTORIO_TEMPORAL[sub] = RUTA_ACTUAL
 
-                elif modo == "creando_subcarpeta":
+                elif modo and modo.startswith("creando_subcarpeta"):
                     sub = texto_original
                     nueva_ruta = os.path.join(RUTA_ACTUAL, sub)
                     output = f"📁 Creando subcarpeta `{sub}` en `{nueva_ruta}`"
                     await log_reply(event.message, output)
                     os.makedirs(nueva_ruta, exist_ok=True)
                     if os.path.exists(nueva_ruta) and os.path.isdir(nueva_ruta):
-                        modo = "elegir_guardar_carpeta"
                         RUTA_ACTUAL = nueva_ruta
                         await event.respond(f"✅ Subcarpeta creada y ruta establecida:\n`{RUTA_ACTUAL}`\n🛠️ ¿Deseas añadirla al listado de directorios disponibles?")
+                        if "archivo" in modo:
+                            descargas_activas[archivo_en_edicion]['ruta'] = RUTA_ACTUAL
+                        modo = "elegir_guardar_carpeta"
                         DIRECTORIO_TEMPORAL = cargar_destinos().copy()
                         DIRECTORIO_TEMPORAL[sub] = RUTA_ACTUAL
                         lista = "\n".join([f"• `{nombre}` → `{ruta}`" for nombre, ruta in DIRECTORIO_TEMPORAL.items()])
                     else:
                         await event.respond(f"❌ Error al crear la carpeta. Ruta de descarga establecida en:\n`{RUTA_ACTUAL}`")
                         modo = None
+                        archivo_en_edicion = None
                 
                 elif modo == "elegir_guardar_carpeta":
                     if command == "guardar" or command == "añadir":
@@ -656,7 +675,9 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                         await event.respond(f"📁 Directorios disponibles:\n\n{lista}")
                     else:
                         output = f"✅ Ruta de descarga establecida en:\n`{RUTA_ACTUAL}`"
+
                     modo = None
+                    archivo_en_edicion = None
                 
                 elif command == "ayuda":
                     lista = "\n\n".join([
