@@ -6,6 +6,7 @@ Fork del trabajo original de Alfonso E.M. <alfonso@el-magnifico.org>
 
 | Funcionalidad                       | Descripción |
 |------------------------------------|-------------|
+| **Carga de configuración desde archivos JSON** | Permite cargar la configuración desde un archivo .json, por lo que es más fácil ejecutar el script. |
 | **Descarga desde enlaces públicos** | Permite descargar archivos desde mensajes enlazados tipo `https://t.me/canal/1234`, no solo desde el canal. |
 | **Gestión dinámica de carpetas**    | Podés cambiar la ruta de descarga durante la ejecución y crear/usar subcarpetas fácilmente. |
 | **Soporte para múltiples rutas de destino** | Se puede seleccionar entre múltiples carpetas (`listar rutas`, `cambiar ruta`) e incluso guardar nuevas. |

@@ -570,8 +570,6 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                     else:
                         output += "\n\n📄 No hay archivos."
 
-                    await event.reply(output, parse_mode="markdown")
-
                 elif command == "cambiar ruta":
                     modo = "esperando_carpeta"
                     output = f"🛠️ ¿Dónde quieres guardar las descargas?"
@@ -592,6 +590,7 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                             output = f"🛠️ Carpeta seleccionada: `{clave_real}` - `{RUTA_ACTUAL}`\n¿Quieres crear, usar una subcarpeta o ahí mismo?"
                             modo = "subcarpeta"
                         else:
+                            modo = None
                             output = f"❌ Carpeta no válida. Ruta de descarga establecida en:\n`{RUTA_ACTUAL}`"
                     else:
                         output = f"❌ Carpeta no válida. Ruta de descarga establecida en:\n`{RUTA_ACTUAL}`"
@@ -599,14 +598,14 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                 
                 elif modo and modo.startswith("subcarpeta"):
                     subcarpetas = listar_subcarpetas(RUTA_ACTUAL)
-                    if command == "crear" or command == "si":
+                    if "crear" in command or command == "si":
                         output = "📁 Escribe el nombre de la subcarpeta a crear:"
                         modo = "creando_subcarpeta"
                     
                     elif modo and "alt" in modo:
                         modo = None
                     
-                    elif command == "usar":
+                    elif "usar" in command:
                         if subcarpetas:
                             lista = "\n• " + "\n• ".join(subcarpetas)
                             output = f"📁 Subcarpetas disponibles en `{RUTA_ACTUAL}`:{lista}\n\n✏️ Escribe una para usarla, o cualquier cosa para continuar sin subcarpeta."
@@ -621,6 +620,7 @@ with TelegramClient(getSession(), TELEGRAM_DAEMON_API_ID, TELEGRAM_DAEMON_API_HA
                                 RUTA_ACTUAL = os.path.join(RUTA_ACTUAL, item)
                                 break
                         output = f"✅ Ruta de descarga establecida en:\n`{RUTA_ACTUAL}`"
+                        modo = None
                         if not sub == None:
                             output += "\n🛠️ ¿Deseas añadirla al listado de directorios disponibles?"
                             modo = "elegir_guardar_carpeta"
