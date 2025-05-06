@@ -1,8 +1,12 @@
 {
   "comandos": [
     {
-      "comando": "borrar historial",
-      "descripcion": "Borra el historial de mensajes del bot en el chat."
+      "comando": "borrar historial del canal",
+      "descripcion": "Borra el historial de mensajes del chat del canal."
+    },
+    {
+      "comando": "borrar historial de descargas",
+      "descripcion": "Borra el historial de descargas de esta sesión."
     },
     {
       "comando": "cambiar ruta",
@@ -15,6 +19,10 @@
     {
       "comando": "descargar enlace <URL>",
       "descripcion": "Descarga un mensaje con archivo desde un enlace tipo https://t.me/.../"
+    },
+    {
+      "comando": "descomprimir",
+      "descripcion": "Permite descomprimir archivos compatibles que se encuentren en la ruta actual"
     },
     {
       "comando": "disco duro",
